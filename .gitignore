@@ -1,0 +1,6 @@
+# Rust / Cargo
+contracts/Cargo.lock
+contracts/target
+
+# Private key
+*.pk
