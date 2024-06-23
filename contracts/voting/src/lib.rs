@@ -5,8 +5,10 @@
 extern crate pbc_contract_codegen;
 extern crate pbc_contract_common;
 
+use common::interact::CommonContract;
 use pbc_contract_common::address::Address;
 use pbc_contract_common::context::ContractContext;
+use pbc_contract_common::events::EventGroup;
 use pbc_contract_common::sorted_vec_map::{SortedVecMap, SortedVecSet};
 
 /// The state of the vote, which is persisted on-chain.
@@ -80,10 +82,18 @@ pub fn initialize(
 /// The updated vote state reflecting the newly cast vote.
 ///
 #[action(shortname = 0x01)]
-pub fn vote(ctx: ContractContext, mut state: VoteState, vote: bool) -> VoteState {
+pub fn vote(
+    ctx: ContractContext,
+    mut state: VoteState,
+    vote: bool,
+    verify_address: Address,
+) -> (VoteState, Vec<EventGroup>) {
     assert!(state.voters.contains(&ctx.sender), "Not an eligible voter");
     state.votes.insert(ctx.sender, vote);
-    state
+    let mut e = EventGroup::builder();
+    CommonContract::at_address(verify_address).verify(&mut e, true);
+    let event_group = e.build();
+    (state, vec![event_group])
 }
 
 /// Count the votes and publish the result.

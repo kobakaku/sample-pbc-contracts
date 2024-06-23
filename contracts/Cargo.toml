@@ -3,7 +3,9 @@ resolver = "2"
 
 members = [
     "voting",
-    "zk-voting-simple"
+    "zk-voting-simple",
+    "common",
+    "verify"
 ]
 
 [workspace.package]
